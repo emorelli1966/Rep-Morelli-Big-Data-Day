@@ -1,0 +1,97 @@
+   i) --------------------------------Versão do SO
+
+-> uname -a
+	Linux ubuntu-1gb-nyc3-01 4.4.0-45-generic #66-Ubuntu SMP Wed Oct 19 14:12:37 UTC 2016 x86_64 x86_64 x86_64 GNU/Linux
+
+-> lsb_release -a
+	No LSB modules are available.
+	Distributor ID: Ubuntu
+	Description:    Ubuntu 16.04.1 LTS
+	Release:        16.04
+	Codename:       xenial
+
+
+   ii) ----------------------------- Importar chave pública utilizada pelo sistema gerenciador de packages
+
+sudo apt-key adv --keyserver hkp://keyserver.ubuntu.com:80 --recv 0C49F3730359A14518585931BC711F9BA15703C6
+
+Executing: /tmp/tmp.WheRnfPwG9/gpg.1.sh --keyserver
+hkp://keyserver.ubuntu.com:80
+--recv
+0C49F3730359A14518585931BC711F9BA15703C6
+gpg: requesting key A15703C6 from hkp server keyserver.ubuntu.com
+gpg: key A15703C6: public key "MongoDB 3.4 Release Signing Key <packaging@mongodb.com>" imported
+gpg: Total number processed: 1
+gpg:               imported: 1  (RSA: 1)
+
+
+  iii) ----------------------------- Cria lista de arquivos
+
+echo "deb [ arch=amd64,arm64 ] http://repo.mongodb.org/apt/ubuntu xenial/mongodb-org/3.4 multiverse" | sudo tee /etc/apt/sources.list.d/mongodb-org-3.4.list
+
+
+   iv) ----------------------------- Atualizar lista de packages
+
+sudo apt-get update
+
+   v) ----------------------------- Instalação propriamente dita
+
+
+sudo apt-get install -y mongodb-org
+
+  vi) ----------------------------- Criação de usuário mongousr
+
+-- como root
+	mkdir -p /data
+	chown -R mongousr:mongogrp /data
+	chmod -R 755 /data
+
+	su - mongousr
+	mkdir /data/db
+	mongod --dbpath /data/db --logpath /data/log --storageEngine wiredTiger &
+
+	ps -efH | grep mongod | grep -v grep
+	tail /data/log
+
+ vii) ----------------------------- Ativando MongoDB
+
+su - mongousr
+
+mkdir /data/db
+
+mongod --dbpath /data/db --logpath /data/log --storageEngine wiredTiger &
+
+ps -efH | grep mongod | grep -v grep
+
+<< "perdemos" 1 GB  >>
+
+df -h
+...
+/dev/vda1        30G  5.6G   23G  20% /
+...
+$
+
+
+viii) ----------------------------- Interação com MongoDB
+
+mongo sensores --eval "db.dados_sensores.insert ({valor: 1})" --quiet
+mongo sensores --eval "db.dados_sensores.count()" --quiet
+mongo sensores --eval "db.dropDatabase()" --quiet
+
+
+------------------------------------------------------------------------------------------------------------------Leitura Complementar
+How Amadeus is using MongoDB to keep the world moving
+http://www.zdnet.com/article/how-amadeus-is-using-mongodb-to-keep-the-world-moving/
+
+Just When You Thought You Understood RDBMS and NoSQL Databases – This Happens
+http://www.datasciencecentral.com/profiles/blogs/just-when-you-thought-you-understood-rdbms-and-nosql-databases-th
+
+Install MongoDB Community Edition on Ubuntu
+https://docs.mongodb.com/manual/tutorial/install-mongodb-on-ubuntu/
+
+
+
+
+
+
+

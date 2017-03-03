@@ -1,0 +1,75 @@
+------------------------------------------   i)  Instalar Node.JS (Ubuntu)
+-- como root
+apt-get update
+apt-get install nodejs
+
+-- gerenciador de pacotes do Node.js:
+apt-get install npm
+
+-- instalando pacotes para mqtt e mongodb
+npm install mqtt mongodb
+
+-- criando diretório destino para programas
+su - mongousr
+mkdir nodejsCode
+cd nodejsCode
+which nodejs	-- /usr/bin/nodejs
+
+
+------------------------------------------  ii)  O primeiro programa
+--- usando algum editor de textos, criar o "programa"
+vim olaMundo.js
+
+
+/* Meu primeiro programa com  node.js */
+console.log("Olá, Mundo!")
+
+------------------------------------------ iii)  Execução
+
+nodejs olaMundo.js	
+
+------------------------------------------  iv) Integração com MongoDB
+-- Atenção: deve haver algum servidor mongod rodando:
+ps -efH | grep mongod | grep -v grep | wc -l
+
+nodejs
+
+> var mongodb=require('mongodb');  
+> var mongodbClient=mongodb.MongoClient;  
+> var mongodbURI='mongodb://159.203.163.230:27017/sensores'  ;
+
+> var collection;
+
+> function insere (err,db) { 
+  if(err) throw err;
+ 
+  var key = Math.random().toString(16).substr(2, 8);
+  
+  collection=db.collection("dados_sensores");
+
+  collection.insert(  { _id:key,  value:"outro nome", when:new Date() } );
+}
+
+> mongodbClient.connect(mongodbURI,insere);
+
+> process.exit()
+
+
+
+-----------------------------------------------------------------------------------------------Leitura Complementar
+Como Instalar o Node.js no Ubuntu 16.04
+https://www.digitalocean.com/community/tutorials/como-instalar-o-node-js-no-ubuntu-16-04-pt
+
+Node.js Tutorial
+https://www.tutorialspoint.com/nodejs/
+
+Getting Started with Node.js and MQTT
+https://blog.risingstack.com/getting-started-with-nodejs-and-mqtt/
+
+A library for the MQTT protocol
+https://www.npmjs.com/package/mqtt
+
+Building MongoDB Into Your Internet of Things: A Tutorial
+https://www.compose.com/articles/building-mongodb-into-your-internet-of-things-a-tutorial/
+
+
