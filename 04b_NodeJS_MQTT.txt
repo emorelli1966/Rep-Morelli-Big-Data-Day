@@ -1,0 +1,26 @@
+----------------------------------------Antes de começar
+--> Leve os módulos 04c_publicaMQTT.js e 04d_assinaMQTT.js para o diretório /home/nodejsusr/nodejsCode do servidor 
+
+
+
+------------------------------------------------------------------------------------------------   i)  Assinante
+cd /home/nodejsusr/nodejsCode
+nodejs 04d_assinaMQTT.js	
+
+-------------------------------------------------------------------------------------------------  ii) Publicador (em outra sessão)
+cd /home/nodejsusr/nodejsCode
+nodejs 04c_publicaMQTT.js
+
+
+
+-------------------------------------------------------------------------------------------------  iii) Comprovação:
+-- Comente a linha "client.end()" em nodejs 04d_assinaMQTT.js
+
+mosquitto_pub -h localhost -t /sensores/som -m 40
+
+
+
+
+----------------------------------------------Leitura Complementar
+Why is MQTT not connecting with NodeJS?
+http://stackoverflow.com/questions/35347724/why-is-mqtt-not-connecting-with-nodejs

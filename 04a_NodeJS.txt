@@ -1,0 +1,92 @@
+------------------------------------------   i)  Usuário para utilizar o Node.JS
+-- como root
+groupadd -g 1800 nodejsgrp
+mkdir -p /home/nodejsusr
+useradd -u 1900  -g nodejsgrp -d /home/nodejsusr nodejsusr
+passwd nodejsusr 
+<< senha >>
+
+chown -R nodejsusr:nodejsgrp /home/nodejsusr
+
+------------------------------------------   ii)  Instalar Node.JS (Ubuntu)
+apt-get update
+apt-get install nodejs
+
+-- gerenciador de pacotes do Node.js:
+apt-get install npm
+
+-- instalando pacotes para mqtt e mongodb (conectado como usuário nodejsusr)
+su - nodejsusr
+npm install mqtt mongodb
+
+-- criando diretório destino para programas
+cd
+mkdir nodejsCode 	
+cd nodejsCode
+which nodejs	-- /usr/bin/nodejs
+
+
+------------------------------------------  iii)  O primeiro programa
+--- usando algum editor de textos, criar o "programa"
+vim olaMundo.js
+
+
+/* Meu primeiro programa com  node.js */
+console.log("Olá, Mundo!")
+
+------------------------------------------ iv)  Execução
+
+nodejs olaMundo.js	
+
+------------------------------------------  v) Integração com MongoDB
+-- Atenção: deve haver algum servidor mongod rodando no servidor DigitalOcean
+ps -efH | grep mongod | grep -v grep | wc -l
+
+
+-- Ativando ambiente de edição
+nodejs
+
+ var mongodb=require('mongodb');  
+> var mongodbClient=mongodb.MongoClient;  
+
+-- Ajuste o IP abaixo
+> var mongodbURI='mongodb://159.203.163.230:27017/sensores'  ;
+
+> var collection;
+
+> function insere (err,db) { 
+  if(err) throw err;
+ 
+  var key = Math.random().toString(16).substr(2, 8);
+  
+  collection=db.collection("dados_sensores");
+
+  collection.insert(  { _id:key,  value:"outro nome", when:new Date() } );
+}
+
+> mongodbClient.connect(mongodbURI,insere);
+
+> process.exit()
+
+-- Consulta à base recém gravada
+mongo sensores --eval "db.dados_sensores.find ({}, { _id: 0}).pretty()" --quiet
+
+
+
+-----------------------------------------------------------------------------------------------Leitura Complementar
+Como Instalar o Node.js no Ubuntu 16.04
+https://www.digitalocean.com/community/tutorials/como-instalar-o-node-js-no-ubuntu-16-04-pt
+
+Node.js Tutorial
+https://www.tutorialspoint.com/nodejs/
+
+Getting Started with Node.js and MQTT
+https://blog.risingstack.com/getting-started-with-nodejs-and-mqtt/
+
+A library for the MQTT protocol
+https://www.npmjs.com/package/mqtt
+
+Building MongoDB Into Your Internet of Things: A Tutorial
+https://www.compose.com/articles/building-mongodb-into-your-internet-of-things-a-tutorial/
+
+

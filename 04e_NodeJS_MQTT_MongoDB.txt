@@ -1,0 +1,28 @@
+----------------------------------------------------------------------------------------------Antes de começar
+--> Leve o módulo 04f_integraMQTTcomMongoDB.js para o diretório /home/nodejsusr/nodejsCode do servidor 
+
+------------------------------------------   i)  Assinante (corrija o IP!)
+cd /home/nodejsusr/nodejsCode
+
+nodejs 04f_integraMQTTcomMongoDB.js	
+
+------------------------------------------ ii) Persistência
+--> Leve o módulo 04g_mostraDados.js para o diretório /home/mongousr do servidor 
+--> Abra uma nova sessão no servidor da DO, conectado como mongousr
+
+while true
+do
+	clear
+	mongo sensores /home/mongousr/04g_mostraDados.js --quiet
+	sleep 5
+done
+
+
+------------------------------------------  iii) Publicador (ajuste o endereço do publicador)
+mosquitto_pub -h 107.170.74.217 -t sensores/som -m 40
+
+
+
+
+
+

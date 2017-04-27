@@ -1,0 +1,105 @@
+   i) --------------------------------IEEE AASP Challenge: Detection and Classification of Acoustic Scenes and Events
+
+	->  Visite:
+		
+		--> comunidade de armazenamento de arquivos sonoros
+		https://archive.org/details/opensource_audio
+
+		-> detalhes do desafio lançado em 2013
+		http://c4dm.eecs.qmul.ac.uk/sceneseventschallenge/
+
+		-> datasets
+		https://archive.org/download/OS-IRCCYN
+		https://archive.org/details/dcase2013_event_detection_testset_OS
+
+  ii) --------------------------------Preparação dos dados
+
+		-> Usando o R, concatenar arquivos coletados e calcular uma quarta coluna identificando a duração em milionésimos de segundo
+
+		-> Analisar Script: 05b_Coleta_de_Dados.R
+
+
+ iii) --------------------------------AzureML
+ 
+https://studio.azureml.net
+
+Criação de Experimento (menu à esquerda, selecionar EXPERIMENTS); botão "New" na parte inferior; blank experiment
+
+	-> Datasets
+		-> Importar Medidas.csv
+			(lembrando que poderíamos ter executado o script R por aqui - menu Experiments; item: R Language Modules)
+	-> Título do Experimento: "Tratamento de Som"
+
+	-> Incluir o Dataset ao experimento (menu Experiments; item: Saved Datasets, My Datasets)
+
+	-> Incluir módulo para selecionar colunas (módulo "Select Columns in Dataset")
+		-> Conexão: Porta superior unida à Porta inferior do dataset (tanto faz de onde começamos a puxar a seta)
+			-> Launch column selector (deixar apenas as colunas "duração" e "tipo")
+
+	-> Incluir Regressão Linear (na caixa de busca digitar "regress", escolher "Linear Regression")
+		-> Arrastar módulo para área de trabalho
+
+	-> Criação de dados de treino e teste
+		-> Incluir módulo Split Data (na caixa de busca digitar "split", escolher "Split Data")
+			-> Mudar percentual de divisão para 0,7 (70% dos dados serão de treino e restante de teste)
+			-> Digitar um "random seed". Por exemplo, 45689 (pode ser qualquer valor inteiro, não negativo)
+			-> Conexão: Porta superior unida à Porta inferior do módulo "Select Columns in Dataset"
+	-> Treino
+		-> incluir módulo "Train Model"
+			-> Informar variável independente ("Launch Column Selector" : aquela que desejamos prever; no caso, 
+
+			-> Conexão: Porta superior esquerda unida à Porta inferior de "Linear Regression" 
+			-> Conexão: Porta superior direita  unida à Porta inferior esquerda de "Split Data"
+	-> Avaliação 
+		-> incluir módulo "Score Model" (avalia dados de teste)
+			-> Conexão: Porta superior direita  unida à Porta inferior direita de "Split Data" 
+			-> Conexão: Porta superior esquerda unida à Porta inferior de "Train Model" 
+		-> incluir módulo "Evaluate Model"
+			-> Conexão: Porta superior esquerda unida à Porta inferior de "Score Model" 
+
+	-> Executar o Experimento (um "quê" de cientista de dados)
+
+	-> Visualizar resultado (clique direito no módulo "Evaluate Model", escolha "Visualize")
+		-> Analisar relatório (antes, salvar o modelo!)
+			-> "Erro" significa a diferença entre valor real e previsto pelo modelo
+			-> "Coefficient of Determination" é o "R square"; quanto mais próximo de 1, melhor (quão "preciso" é o modelo)
+			-> Por outro lado, o histograma tem "boa" aparência
+
+	-> Criação de um segundo "modelo", em busca de melhor acurácia
+		-> incluir módulo "Neural Network Regression"
+		-> duplicar módulo "Train Model", já presente (clique direito; copy; paste)
+			-> Conexão: Porta superior esquerda unida à Porta inferior de "Neural Network Regression" 
+			-> Conexão: Porta superior direita  unida à Porta inferior esquerda de "Split Data" (podemos aproveitar o já existente)
+		-> idem para módulo "Score Model"
+			-> Conexão: Porta superior esquerda unida à Porta inferior de "Train Model" (aquele que acabamos de inserir)
+			-> Conexão: Porta superior direita  unida à Porta inferior direita de "Split Data" (podemos aproveitar o já existente)
+			-> Conexão: Porta inferior unida à Porta superior direita de "Evaluate Model" 
+
+	-> Salvar e executar o Experimento
+
+	-> Visualizar resultado (comparar dois resultados)
+
+
+  iv) --------------------------------Publicação
+
+	-> Fazer uma cópia do experimento
+		-> Botão "Save As" na barra de ferramentas inferior
+
+	-> Eliminar a "pior" solução mais o módulo "Evaluation"
+		-> módulo "Linear Regression"
+
+	-> Set up Web Services
+		-> Predictive Web Service (cria dois novos módulos: "Web service input" e "Web service output)
+
+	-> Executar novamente 
+
+	-> Deploy Web Service
+		-> Agora temos nossa solução disponível na nuvem da MS, identificada univocamente a partir da "API key"
+
+		-> Em "Test" podemos fornecer dados e efetivamente testar o modelo com dados "reais" (resultado informado em uma estrutura de dados json!)
+
+		-> Acompanhar serviços já criados em "Web Services"
+		
+			
+
+
